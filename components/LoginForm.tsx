@@ -66,9 +66,12 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto mb-10">
       <div className="pb-10">
-        <h1 className="text-2xl font-semibold text-center">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          Start tracking your CGPA
+        </h1>
+        <h1 className="text-lg font-medium text-center mb-2">
           Login with your <span className="text-red-600">CUB</span> UMS
           credentials
         </h1>
@@ -76,7 +79,8 @@ const LoginForm = () => {
           Your ID and password are not stored.
         </p>
         <Link
-          href="/"
+          target="_blank"
+          href="https://github.com/christosuster/CUB-CGPA-Tracker"
           className="flex justify-center hover:text-white hover:animate-none leading-3 items-center  gap-2 underline  underline-offset-2 text-muted-foreground animate-pulse"
         >
           Checkout how it works
@@ -112,7 +116,12 @@ const LoginForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button
+            variant={"secondary"}
+            type="submit"
+            disabled={loading}
+            className="w-full"
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "Loading" : "Login"}
           </Button>

@@ -29,7 +29,11 @@ const Navbar = () => {
       <Image src={logo} alt="Logo" width={120} />
 
       <div className="hover:text-white transition-all absolute text-muted-foreground left-3 top-1/2 -translate-y-1/2">
-        <Link href="/" className="flex gap-1">
+        <Link
+          target="_blank"
+          href="https://github.com/christosuster/CUB-CGPA-Tracker"
+          className="flex gap-1"
+        >
           <LucideGithub className="" />
           <span className="hidden md:block">View on Github</span>
         </Link>

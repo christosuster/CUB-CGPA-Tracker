@@ -15,3 +15,13 @@ export type SemesterGPA={
     CurrentCGPA:number,
     CumulativeCredit:number,
 }
+
+export type course = {
+    Course: string;
+    Credit: number;
+    Grade: string;
+    Score: number;
+    Semester: string;
+    Total: string;
+    CreditScore: number;
+  };

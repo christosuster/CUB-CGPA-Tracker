@@ -10,12 +10,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Card } from "./ui/card";
 
 const Chart = ({ data }: { data: SemesterGPA[] }) => {
-  console.log("rendering");
-
   return (
-    <div className="h-[500px] w-[95%] mx-auto">
+    <Card className="h-[500px] col-span-5 lg:col-span-4 w-full mx-auto">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           className="mx-auto"
@@ -48,7 +47,7 @@ const Chart = ({ data }: { data: SemesterGPA[] }) => {
           />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 };
 

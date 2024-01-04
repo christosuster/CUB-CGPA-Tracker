@@ -1,11 +1,21 @@
 import { Record, SemesterGPA } from "@/utils/types";
 import parse from "html-react-parser";
+
+function formatName(inputString: string) {
+  let trimmedString = inputString.trim().toLowerCase();
+
+
+  let formattedString = trimmedString.replace(/\b\w/g, c => c.toUpperCase());
+
+  return formattedString;
+}
+
 export async function POST(request: Request) {
     const body = await request.json();
     const { cookie } = body;
 
   const phpsessid = "PHPSESSID=" + cookie;
-  console.log(phpsessid);
+  
 
   const scoreData = await fetch("http://ums.cub.edu.bd/ums/ems/courselistmy.php", {
     method: "GET",
@@ -16,11 +26,30 @@ export async function POST(request: Request) {
 
   const res = await scoreData.text();
 
-  let table= "";
-  if(res){
-    table = res.split("<table")[1].split("</table>")[0];
-  table = "<table" + table + "</table>";
+  const found = res.search("My Information");
+
+  if (found === -1) {
+    return new Response(JSON.stringify({ 
+      status: "error",
+      message: "Something went wrong. Please login again."
+     }));
   }
+
+  const id = res.split("<h3>")[1].split("</h3>")[0];
+  
+  
+  let image = res.split('<img src="../')[1].split('"')[0];
+  
+
+  let name = res.split(image)[1].split('>')[1].split('<')[0];
+  name = formatName(name);
+  
+
+image = "http://ums.cub.edu.bd/ums/" + image;
+  
+   let table = res.split("<table")[1].split("</table>")[0];
+  table = "<table" + table + "</table>";
+  
     
 
 
@@ -60,14 +89,20 @@ export async function POST(request: Request) {
       
     });
 
-    tableElements.map((e) => {
+    const cleanedTableElements = tableElements.filter(e=>{
+      return !isNaN(e.Credit) && !isNaN(e.Score) && !isNaN(e.CreditScore)
+    });
+
+
+    cleanedTableElements.map((e) => {
+    
       e.CreditScore = e.Credit * e.Score;
     });
 
     const semesterGPA: SemesterGPA[] = [];
     const semesters: string[] = [];
 
-    tableElements.reverse().map((e) => {
+    cleanedTableElements.reverse().map((e) => {
       if (!semesters.includes(e.Semester)) {
         semesters.push(e.Semester);
       }
@@ -76,7 +111,7 @@ export async function POST(request: Request) {
     let cumulativeCredit = 0;
     let creditGPA = 0;
     semesters.map((semester) => {
-      const semesterData = tableElements.filter(
+      const semesterData = cleanedTableElements.filter(
         (e) => e.Semester === semester
       ) as Record[];
       const semesterCredit = semesterData.reduce(
@@ -103,5 +138,16 @@ export async function POST(request: Request) {
       semesterGPA.push(data);
     });
 
-    return new Response(JSON.stringify(semesterGPA));
+    
+
+    return new Response(JSON.stringify({
+      status: "success",
+      data: {
+        semesterGPA,
+      name,
+      image,
+      id,
+      courses: cleanedTableElements,
+      }
+    }));
 }
