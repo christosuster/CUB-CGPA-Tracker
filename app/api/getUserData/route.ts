@@ -1,23 +1,10 @@
+import { Record, SemesterGPA } from "@/utils/types";
+import parse from "html-react-parser";
 export async function POST(request: Request) {
-    
-
     const body = await request.json();
-    const { ID,Pass } = body;
+    const { cookie } = body;
 
-  const content =
-    `POST%20%2Fums%2Fems%2Floginems.php%20HTTP%2F1.1=&Host%3A%20ums.cub.edu.bd=&Content-Length%3A%2091=&Cache-Control%3A%20max-age=0&Sec-Ch-Ua-Mobile%3A%20%3F0=&Sec-Ch-Ua-Platform%3A%20%22Windows%22=&Upgrade-Insecure-Requests%3A%201=&Origin%3A%20https%3A%2F%2Fums.cub.edu.bd=&Content-Type%3A%20application%2Fx-www-form-urlencoded=&User-Agent%3A%20Mozilla%2F5.0%20(Windows%20NT%2010.0%3B%20Win64%3B%20x64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F119.0.6045.159%20Safari%2F537.36=&Sec-Fetch-Site%3A%20same-origin=&Sec-Fetch-Mode%3A%20navigate=&Sec-Fetch-User%3A%20%3F1=&Sec-Fetch-Dest%3A%20document=&Referer%3A%20https%3A%2F%2Fums.cub.edu.bd%2Fums%2Fems%2Findex.php=&Accept-Encoding%3A%20gzip%2C%20deflate%2C%20br=&Accept-Language%3A%20en-US%2Cen%3Bq=0.9&Priority%3A%20u=0%2C%20i&Connection%3A%20close=&source=%2524actpage&globalkey=%2524globalkey&DataType=Login&gemsname=${ID}&gemspass=${Pass}`;
-
-  const login = await fetch("http://ums.cub.edu.bd/ums/ems/loginems.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: content,
-  });
-
-  const loginData = login.headers.getSetCookie()[0];
-
-  const phpsessid = "PHPSESSID=" + loginData.split(";")[0].split("=")[1];
+  const phpsessid = "PHPSESSID=" + cookie;
   console.log(phpsessid);
 
   const scoreData = await fetch("http://ums.cub.edu.bd/ums/ems/courselistmy.php", {
@@ -27,11 +14,94 @@ export async function POST(request: Request) {
     },
   });
 
-
   const res = await scoreData.text();
 
-    let table = res.split("<table")[1].split("</table>")[0];
+  let table= "";
+  if(res){
+    table = res.split("<table")[1].split("</table>")[0];
   table = "<table" + table + "</table>";
+  }
+    
 
-    return new Response(table);
+
+    const tableData = parse(table) as JSX.Element;
+
+    const tableHeader = [
+      "Semester",
+      "Course",
+      "Credit",
+      "Total",
+      "Grade",
+      "Score",
+    ];
+    const tableElements: Record[] = [];
+    tableData.props.children.map((row: any) => {
+      if(row.type == "tr"){
+        const rowData = {
+        Course: "",
+        Credit: 0,
+        Grade: "",
+        Score: 0,
+        Semester: "",
+        Total: "",
+        CreditScore: 0,
+      };
+      
+      
+      row.props.children.map((e: any, i: number) => {
+        if (i === 2 || i === 5) {
+          Object.assign(rowData, { [tableHeader[i]]: e.props.children * 1 });
+        } else {
+          Object.assign(rowData, { [tableHeader[i]]: e.props.children });
+        }
+      });
+      tableElements.push(rowData);
+      }
+      
+    });
+
+    tableElements.map((e) => {
+      e.CreditScore = e.Credit * e.Score;
+    });
+
+    const semesterGPA: SemesterGPA[] = [];
+    const semesters: string[] = [];
+
+    tableElements.reverse().map((e) => {
+      if (!semesters.includes(e.Semester)) {
+        semesters.push(e.Semester);
+      }
+    });
+    let currentCGPA = 0;
+    let cumulativeCredit = 0;
+    let creditGPA = 0;
+    semesters.map((semester) => {
+      const semesterData = tableElements.filter(
+        (e) => e.Semester === semester
+      ) as Record[];
+      const semesterCredit = semesterData.reduce(
+        (acc, cur) => acc + cur.Credit,
+        0
+      );
+      const semesterCreditScore = semesterData.reduce(
+        (acc, cur) => acc + cur.CreditScore,
+        0
+      );
+      const GPA = semesterCreditScore / semesterCredit;
+
+      cumulativeCredit = cumulativeCredit + semesterCredit;
+      creditGPA = creditGPA + GPA * semesterCredit;
+      currentCGPA = creditGPA / cumulativeCredit;
+
+      const data = {
+        Semester: semester,
+        GPA: +GPA.toFixed(2),
+        Credit: semesterCredit,
+        CurrentCGPA: +currentCGPA.toFixed(2),
+        CumulativeCredit: cumulativeCredit,
+      };
+      semesterGPA.push(data);
+    });
+
+    return new Response(JSON.stringify(semesterGPA));
 }

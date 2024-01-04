@@ -1,60 +1,48 @@
 "use client";
-import { Record } from "@/types";
-import parse from "html-react-parser";
+import Chart from "@/components/Chart";
+import { Loader2 } from "lucide-react";
+import { SemesterGPA } from "@/utils/types";
+import { useContext, useEffect, useState } from "react";
+import { getCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Home() {
-  const getData = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}api/getUserData`, {
+  const [data, setData] = useState<SemesterGPA[]>([]);
+  const router = useRouter();
+  const cookie = getCookie("PHPSESSID");
+  // const { cookie } = useContext(CookieContext) as ContextType;
+
+  useEffect(() => {
+    if (!cookie) {
+      router.push("/login");
+      return;
+    }
+    console.log(cookie);
+    fetch(`${process.env.NEXT_PUBLIC_URL}api/getUserData`, {
       method: "POST",
       body: JSON.stringify({
-        ID: process.env.NEXT_PUBLIC_ID,
-        Pass: process.env.NEXT_PUBLIC_PASS,
+        cookie: cookie,
       }),
+    }).then((res) => {
+      if (res.status === 200) {
+        res.json().then((data) => {
+          setData(data);
+          console.log(data);
+        });
+      } else {
+        toast.error("Error: " + res.statusText);
+      }
     });
-
-    const data = await res.text();
-
-    const tableData = parse(data) as JSX.Element;
-
-    const tableHeader = [
-      "Semester",
-      "Course",
-      "Credit",
-      "Total",
-      "Grade",
-      "Score",
-    ];
-    const tableElements: Record[] = [];
-    tableData.props.children[1].props.children.map((row: any) => {
-      const rowData = {
-        Course: "",
-        Credit: 0,
-        Grade: "",
-        Score: 0,
-        Semester: "",
-        Total: "",
-      };
-      row.props.children.map((e: any, i: number) => {
-        if (i === 2 || i === 5) {
-          Object.assign(rowData, { [tableHeader[i]]: e.props.children * 1 });
-        } else {
-          Object.assign(rowData, { [tableHeader[i]]: e.props.children });
-        }
-      });
-      tableElements.push(rowData);
-    });
-
-    console.log(tableElements);
-  };
+  }, [cookie]);
 
   return (
-    <main className="flex flex-col h-screen justify-center items-center">
-      <button
-        className="bg-blue-600 p-3 hover:bg-blue-800 rounded-2xl"
-        onClick={getData}
-      >
-        Get Data
-      </button>
-    </main>
+    <div className="w-full">
+      {data.length > 0 ? (
+        <Chart data={data} />
+      ) : (
+        <Loader2 className="mx-auto h-10 w-10 animate-spin" />
+      )}
+    </div>
   );
 }
