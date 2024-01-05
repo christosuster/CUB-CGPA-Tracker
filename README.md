@@ -1,3 +1,6 @@
+
+![cub-cgpa-tracker vercel app_ (1)](https://github.com/christosuster/CUB-CGPA-Tracker/assets/15941653/d422cc0c-d54c-4d27-adfd-618b0c123ad7)
+
 # CUB CGPA Tracker
 
 ## Overview
