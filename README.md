@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+![cub-cgpa-tracker vercel app_ (1)](https://github.com/christosuster/CUB-CGPA-Tracker/assets/15941653/d422cc0c-d54c-4d27-adfd-618b0c123ad7)
 
-First, run the development server:
+# CUB CGPA Tracker
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Welcome to CUB CGPA Tracker, your personalized tool for visualizing academic progress! By utilizing advanced web scraping techniques, this tool securely extracts course and grade data from the EMS of Canadian University of Bangladesh and dynamically generates graphs showcasing the evolution of CGPA across semesters. Empower yourself with insights into your academic progress.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Web Scraping Technology:** Utilizes cutting-edge web scraping to extract course and grade information securely.
+- **User Authentication:** Users can securely input their university credentials to initiate the data extraction process.
+- **Dynamic Graphs:** CUB CGPA Tracker dynamically generates graphs, visually representing GPA and CGPA changes across semesters.
+- **Intuitive Interface:** A user-friendly responsive interface ensures a seamless experience for data visualization.
 
-## Learn More
+## Privacy Assurance
 
-To learn more about Next.js, take a look at the following resources:
+**Privacy Note:** CUB CGPA Tracker prioritizes user privacy. Due to the lack of necessity, this web app does not store or retain any user ID or password information.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Enjoy tracking your academic progress with CUB CGPA Tracker!
