@@ -31,7 +31,7 @@ export default function RootLayout({
             Developed by{" "}
             <a
               className="hover:underline hover:underline-offset-2 font-semibold hover:text-yellow-400"
-              href="https://christosuster.me/"
+              href="https://christosuster.dev/"
               target="_blank"
               rel="noopener noreferrer"
             >
